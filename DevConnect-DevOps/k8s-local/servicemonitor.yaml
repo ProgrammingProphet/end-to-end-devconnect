@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-metrics
+  namespace: devconnect-prod
+  labels:
+    app: backend
+    release: prometheus
+spec:
+  selector:
+    app: backend
+  ports:
+    - name: metrics
+      port: 5000
+      targetPort: 5000
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: backend-monitor
+  namespace: devconnect-prod
+  labels:
+    release: prometheus
+    app: backend
+spec:
+  selector:
+    matchLabels:
+      app: backend
+  namespaceSelector:
+    matchNames:
+      - devconnect-prod
+  endpoints:
+    - port: metrics   # ✅ FIXED (string + matches service port name)
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s
+

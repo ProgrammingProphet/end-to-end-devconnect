@@ -1,0 +1,27 @@
+config:
+  # The URL of your Loki instance
+  clients:
+    - url: http://loki-gateway.monitoring.svc.cluster.local/loki/api/v1/push
+
+  # By default, promtail scrapes all Kubernetes pods on the node it is running on.
+  # We just need to ensure the correct endpoints and parsing strategies are laid out.
+  snippets:
+    pipelineStages:
+      - cri: {}
+
+# Mount host paths to collect logs
+extraVolumes:
+  - name: containers
+    hostPath:
+      path: /var/log/containers
+  - name: pods
+    hostPath:
+      path: /var/log/pods
+
+extraVolumeMounts:
+  - name: containers
+    mountPath: /var/log/containers
+    readOnly: true
+  - name: pods
+    mountPath: /var/log/pods
+    readOnly: true

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: devconnect-prod
+data:
+  NODE_ENV: "production"
+  PORT: "5000"
+  MONGODB_URI: "mongodb://admin:password123@mongodb-service:27017/devconnect?authSource=admin"
+  JWT_EXPIRE: "7d"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: devconnect-prod
+data:
+  VITE_API_URL: "/api"
+  VITE_ENVIRONMENT: "production"

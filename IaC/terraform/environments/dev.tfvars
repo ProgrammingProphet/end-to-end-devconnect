@@ -1,0 +1,9 @@
+environment         = "dev"
+vpc_cidr            = "10.10.0.0/16"
+public_subnet_cidrs = ["10.10.1.0/24"]
+private_subnet_cidrs = []
+dev_instance_type   = "t3.medium"
+project_name        = "Kubernetes-Lab"
+owner               = "DevOps-Team"
+cost_center         = "Infrastructure-101"
+key_name            = "AWS-Key"

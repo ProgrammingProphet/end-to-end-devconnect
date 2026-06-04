@@ -1,0 +1,12 @@
+environment              = "prod"
+vpc_cidr                 = "10.30.0.0/16"
+public_subnet_cidrs      = ["10.30.1.0/24", "10.30.2.0/24"]
+private_subnet_cidrs     = ["10.30.11.0/24", "10.30.12.0/24"]
+prod_node_instance_types = ["t3.medium"]
+prod_node_desired_size   = 2
+prod_node_min_size       = 2
+prod_node_max_size       = 5
+project_name             = "Kubernetes-Lab"
+owner                    = "DevOps-Team"
+cost_center              = "Infrastructure-101"
+key_name                 = "AWS-Key"

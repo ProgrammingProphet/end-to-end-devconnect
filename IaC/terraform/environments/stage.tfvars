@@ -1,0 +1,10 @@
+environment                = "stage"
+vpc_cidr                   = "10.20.0.0/16"
+public_subnet_cidrs        = ["10.20.1.0/24"]
+private_subnet_cidrs       = ["10.20.11.0/24", "10.20.12.0/24"]
+stage_master_instance_type = "t3.medium"
+stage_worker_instance_type = "t3.medium"
+project_name               = "Kubernetes-Lab"
+owner                      = "DevOps-Team"
+cost_center                = "Infrastructure-101"
+key_name                   = "AWS-Key"

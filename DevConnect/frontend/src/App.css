@@ -1,0 +1,166 @@
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Global link styles with hover effects */
+a {
+  transition: color var(--transition-fast);
+}
+
+a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Page transition animations */
+.page-enter {
+  animation: pageEnter var(--transition-base) ease-out;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .page-enter {
+    animation: none;
+  }
+}
+
+/* Dashboard Styles */
+.dashboard {
+  padding: 40px 20px;
+}
+
+.dashboard h1 {
+  margin-bottom: 30px;
+  color: #333;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.stat-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card h3 {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.stat-card .number {
+  color: #007bff;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.recent-section {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.recent-section h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.recent-list {
+  list-style: none;
+}
+
+.recent-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.recent-item:last-child {
+  border-bottom: none;
+}
+
+.recent-item-info h4 {
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.recent-item-info p {
+  color: #666;
+  font-size: 14px;
+}
+
+.recent-item-date {
+  color: #999;
+  font-size: 12px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-todo {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.status-in-progress {
+  background-color: #17a2b8;
+  color: #fff;
+}
+
+.status-review {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+.status-done {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.priority-low {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.priority-medium {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.priority-high {
+  background-color: #fd7e14;
+  color: #fff;
+}
+
+.priority-critical {
+  background-color: #dc3545;
+  color: #fff;
+}

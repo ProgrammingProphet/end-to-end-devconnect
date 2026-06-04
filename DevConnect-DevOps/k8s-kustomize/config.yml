@@ -1,0 +1,35 @@
+apiVersion: kind.x-k8s.io/v1alpha4 #api version of kind kind.x-k8s.io/v1alpha4 is the latest version
+kind: Cluster
+metadata:
+  name: DevConnect-Cluster
+nodes:
+  - role: control-plane
+    image: kindest/node:v1.30.0 #latest version of kindest/node
+  - role: worker
+    image: kindest/node:v1.30.0
+  - role: worker
+    image: kindest/node:v1.30.0
+
+#command to create cluster: kind create cluster --name devconnect-cluster
+#use config.yml file to create cluster: kind create cluster --config config.yml
+#command to delete cluster: kind delete cluster --name devconnect-cluster
+
+# @sha256:b91a2c2317a000f3a783489dfb755064177dbc3a0b2f4147d50f04825d016f
+# what is this?
+
+# this is a sha256 hash of the image used in the kind cluster
+# it is used to ensure the integrity of the image
+# optional but recommended
+
+# how to deploy to aks using git action cd
+# 1. create a service principal for aks
+# 2. create a secret in github for the service principal
+# 3. create a workflow in github to deploy to aks
+
+# now we did CI Part - build and push to docker hub
+# now next part is to run on local machine
+# and test the application
+# and check if everything is working fine
+# and if everything is working fine then we will deploy to aks
+
+# next we need to do CD Part - deploy to aks

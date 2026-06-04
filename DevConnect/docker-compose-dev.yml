@@ -1,0 +1,91 @@
+version: "3.9"
+
+services:
+  mongodb:
+    image: mongo:6
+    container_name: devconnect-mongodb-dev
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: devconnect
+    volumes:
+      - mongo-data-dev:/data/db
+    networks:
+      - devconnect-network-dev
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "0.75"
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  backend-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: devconnect-backend-dev
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: development
+      PORT: 5000
+      MONGODB_URI: mongodb://admin:password123@mongodb:27017/devconnect?authSource=admin
+      JWT_SECRET: 0de3991ef24c9addcf0d624ce36d59d49d2d7f7a8a3309f553f3df0e1a827c16
+      JWT_EXPIRE: 14d
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - devconnect-network-dev
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: devconnect-frontend-dev
+    restart: unless-stopped
+    ports:
+      - "3000:5173"
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+      DOCKER_ENV: "true"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - devconnect-network-dev
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          memory: 128M
+
+volumes:
+  mongo-data-dev:
+
+networks:
+  devconnect-network-dev:
+    driver: bridge

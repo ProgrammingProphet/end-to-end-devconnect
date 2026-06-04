@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loki-datasource
+  namespace: monitoring # Because kube-prometheus-stack resides here
+  labels:
+    grafana_datasource: "1" # This label makes kube-prometheus-stack auto-discover the datasource
+data:
+  loki-datasource.yaml: |-
+    apiVersion: 1
+    datasources:
+      - name: Loki
+        type: loki
+        url: http://loki-gateway.monitoring.svc.cluster.local
+        access: proxy
+        isDefault: false
+        version: 1
+        jsonData:
+          maxLines: 1000

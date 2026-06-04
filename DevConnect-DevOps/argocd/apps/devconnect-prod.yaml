@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: devconnect-prod
+  namespace: argocd
+  annotations:
+    # Argo CD Image Updater Configurations
+    argocd-image-updater.argoproj.io/image-list: backend=programmingprobhet/devconnect-backend, frontend=programmingprobhet/devconnect-frontend
+    # Use Semantic Versioning for production upgrades
+    argocd-image-updater.argoproj.io/backend.update-strategy: semver
+    argocd-image-updater.argoproj.io/backend.allow-tags: regexp:^v[0-9]+\.[0-9]+\.[0-9]+$
+    argocd-image-updater.argoproj.io/frontend.update-strategy: semver
+    argocd-image-updater.argoproj.io/frontend.allow-tags: regexp:^v[0-9]+\.[0-9]+\.[0-9]+$
+    # Write back changes directly to the Git repository
+    argocd-image-updater.argoproj.io/write-back-method: git
+    argocd-image-updater.argoproj.io/git_branch: main
+spec:
+  project: devconnect-project
+  source:
+    repoURL: 'https://github.com/ProgrammingProphet/DevConnect-DevOps.git'
+    targetRevision: main
+    path: k8s/overlays/prod
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: devconnect-prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

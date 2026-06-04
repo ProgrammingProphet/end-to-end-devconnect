@@ -1,0 +1,60 @@
+---
+# 1. Add Helm repos
+- name: Add Helm chart repositories
+  command: "helm repo add {{ item.name }} {{ item.url }}"
+  loop:
+    - { name: 'prometheus-community', url: 'https://prometheus-community.github.io/helm-charts' }
+    - { name: 'jetstack', url: 'https://charts.jetstack.io' }
+    - { name: 'ingress-nginx', url: 'https://kubernetes.github.io/ingress-nginx' }
+    - { name: 'metrics-server', url: 'https://kubernetes-sigs.github.io/metrics-server/' }
+  changed_when: true
+
+- name: Update Helm repositories
+  command: helm repo update
+  changed_when: true
+
+# 2. Deploy Cert Manager
+- name: Create namespace 'cert-manager'
+  command: kubectl create namespace cert-manager
+  register: cm_ns
+  failed_when: false
+  changed_when: "'created' in cm_ns.stdout"
+
+- name: Install Cert Manager via Helm
+  command: >
+    helm upgrade --install cert-manager jetstack/cert-manager 
+    --namespace cert-manager 
+    --set crds.enabled=true 
+    --version v1.14.5
+  changed_when: true
+
+# 3. Deploy Ingress NGINX (Non-EKS only; EKS uses AWS ALB Controller)
+- name: Install Ingress NGINX via Helm (Dev/Stage)
+  command: >
+    helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx 
+    --namespace ingress-nginx --create-namespace
+  when: not (is_eks | default(false))
+  changed_when: true
+
+# 4. Deploy Metrics Server
+- name: Install Metrics Server via Helm (with insecure TLS for local development/staging)
+  command: >
+    helm upgrade --install metrics-server metrics-server/metrics-server 
+    --namespace kube-system
+    {{ '--set args={--kubelet-insecure-tls}' if not (is_eks | default(false)) else '' }}
+  changed_when: true
+
+# 5. Deploy Prometheus and Grafana Stack (kube-prometheus-stack)
+- name: Create namespace 'monitoring'
+  command: kubectl create namespace monitoring
+  register: mon_ns
+  failed_when: false
+  changed_when: "'created' in mon_ns.stdout"
+
+- name: Install Prometheus & Grafana stack via Helm
+  command: >
+    helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack 
+    --namespace monitoring
+    --set grafana.service.type={{ 'LoadBalancer' if (is_eks | default(false)) else 'NodePort' }}
+    --set prometheus.prometheusSpec.podAntiAffinity=""
+  changed_when: true

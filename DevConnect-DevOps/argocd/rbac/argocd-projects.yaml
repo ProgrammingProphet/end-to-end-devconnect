@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: devconnect-project
+  namespace: argocd
+spec:
+  description: "DevConnect Project grouping all environments (dev, stage, prod)"
+  
+  # Allow deployments only from our official DevConnect-DevOps Git Repository
+  sourceRepos:
+    - 'https://github.com/ProgrammingProphet/DevConnect-DevOps.git'
+    
+  # Allow deployments only to target clusters and specific devconnect environments
+  destinations:
+    - namespace: devconnect-dev
+      server: https://kubernetes.default.svc
+    - namespace: devconnect-stage
+      server: https://kubernetes.default.svc
+    - namespace: devconnect-prod
+      server: https://kubernetes.default.svc
+      
+  # Define what resources can be deployed (Namespaced resources only, deny ClusterRoles/ClusterRoleBindings)
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'
+      
+  # Deny deployment of cluster-scoped resources by default for safety
+  clusterResourceWhitelist:
+    - group: ''
+      kind: PersistentVolume # MongoDB PersistentVolume requires cluster scope
+    - group: 'apiextensions.k8s.io'
+      kind: CustomResourceDefinition

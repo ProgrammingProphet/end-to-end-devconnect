@@ -1,0 +1,45 @@
+## values.yaml to be used with the kube-prometheus-stack Helm chart
+
+# Enable the core components
+prometheus:
+  enabled: true
+  prometheusSpec:
+    # Retain metrics for 15 days
+    retention: 15d
+    # Configure auto-discovery of Pods and Services matching specific labels
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+
+alertmanager:
+  enabled: true
+
+# Enable Node Exporter to get node-level metrics (CPU, memory, disk, etc.)
+nodeExporter:
+  enabled: true
+
+# Enable Kube State Metrics to expose cluster-level data
+kubeStateMetrics:
+  enabled: true
+
+# Grafana Configuration
+grafana:
+  enabled: true
+  
+  # Automatically configure Prometheus as the default datasource for Grafana
+  sidecar:
+    datasources:
+      enabled: true
+      defaultDatasourceEnabled: true
+    dashboards:
+      enabled: true
+      # Automatically discover configmaps containing dashboards in the monitoring namespace
+      label: grafana_dashboard
+      labelValue: "1"
+
+  # Default login credentials
+  adminPassword: "admin"
+  adminUser: "admin"
+
+  # (Optional) Service configuration can be handled here or via a separate manifest
+  # service:
+  #   type: LoadBalancer

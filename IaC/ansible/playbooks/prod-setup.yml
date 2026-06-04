@@ -1,0 +1,47 @@
+---
+- name: Post-Cluster Bootstrap for Amazon EKS
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    # These match our Terraform inputs
+    aws_region: "ap-south-1"
+    cluster_name: "prod-eks"
+    is_eks: true
+
+  tasks:
+    - name: Update kubeconfig context for EKS
+      command: "aws eks update-kubeconfig --region {{ aws_region }} --name {{ cluster_name }}"
+      register: kubeconfig_update
+      changed_when: true
+
+    - name: Verify cluster connection
+      command: kubectl cluster-info
+      register: cluster_info
+      changed_when: false
+
+    - name: Print cluster info
+      debug:
+        msg: "{{ cluster_info.stdout_lines }}"
+
+    # Run bootstrapping roles locally targeting EKS context
+    - name: Install Helm locally (if missing)
+      include_role:
+        name: helm
+
+    - name: Install Kustomize locally (if missing)
+      include_role:
+        name: kustomize
+
+    - name: Deploy ArgoCD on EKS
+      include_role:
+        name: argocd
+      vars:
+        local_execution: true
+
+    - name: Deploy Monitoring (Prometheus/Grafana/Metrics Server) on EKS
+      include_role:
+        name: monitoring
+      vars:
+        local_execution: true

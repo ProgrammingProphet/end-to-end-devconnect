@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: frontend-rollout
+  namespace: devconnect
+spec:
+  replicas: 3
+  strategy:
+    blueGreen:
+      # Active service routes live traffic
+      activeService: frontend-service
+      # Preview service routes test/verification traffic
+      previewService: frontend-preview-service
+      # Automatically promote after testing
+      autoPromotionEnabled: true
+      autoPromotionLimitSeconds: 600 # Auto promote after 10 mins if no manual override
+  selector:
+    matchLabels:
+      app: frontend-devconnect
+  template:
+    metadata:
+      labels:
+        app: frontend-devconnect
+    spec:
+      containers:
+        - name: frontend-devconnect
+          image: programmingprobhet/devconnect-frontend:latest
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "256m"
+            requests:
+              memory: "64Mi"
+              cpu: "128m"
+          ports:
+            - containerPort: 80

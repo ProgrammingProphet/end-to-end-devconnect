@@ -1,0 +1,22 @@
+---
+- name: Check if kustomize is installed
+  command: which kustomize
+  register: kustomize_installed
+  failed_when: false
+  changed_when: false
+
+- name: Install Kustomize binary
+  block:
+    - name: Download Kustomize archive
+      get_url:
+        url: "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F{{ kustomize_version | default('v5.4.1') }}/kustomize_{{ kustomize_version | default('v5.4.1') }}_linux_amd64.tar.gz"
+        dest: /tmp/kustomize.tar.gz
+        mode: '0644'
+
+    - name: Extract Kustomize CLI to bin
+      unarchive:
+        src: /tmp/kustomize.tar.gz
+        dest: /usr/local/bin/
+        remote_src: yes
+        mode: '0755'
+  when: kustomize_installed.rc != 0

@@ -1,0 +1,44 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: custom-alerts
+  namespace: monitoring
+  labels:
+    role: alert-rules
+    # These labels make the kube-prometheus-stack auto-discover this rule
+    release: kube-prometheus-stack 
+spec:
+  groups:
+  - name: custom.rules
+    rules:
+    # Note: Values here are thresholds purely for example purposes
+    
+    # 1. High CPU Usage Alert
+    - alert: HighCPUUsage
+      expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: High CPU usage on {{ $labels.instance }}
+        description: "Node {{ $labels.instance }} has had > 85% CPU usage for the last 5 minutes."
+
+    # 2. Node Memory Pressure Alert
+    - alert: NodeMemoryPressure
+      expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 90
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: High Memory usage on {{ $labels.instance }}
+        description: "Node {{ $labels.instance }} has > 90% memory used for the last 5 minutes."
+
+    # 3. Pod CrashLoop Alert
+    - alert: PodCrashLoopBackOff
+      expr: sum by (namespace, pod) (rate(kube_pod_container_status_restarts_total[5m])) * 60 * 5 > 2
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: Pod {{ $labels.pod }} in CrashLoopBackOff
+        description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is restarting too frequently."

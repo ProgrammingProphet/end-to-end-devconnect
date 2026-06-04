@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-rbac-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: argocd
+data:
+  # Enable fine-grained RBAC configuration
+  policy.default: role:readonly
+  
+  policy.csv: |
+    # Standard policies defining Argo CD Roles and Group mappings
+    # Syntax: p, role:role-name, resource, action, object
+    
+    # 1. Developer Role: Can sync and manage apps in Dev/Staging projects, but cannot delete/create them
+    p, role:developer, applications, get, devconnect-project/*, allow
+    p, role:developer, applications, sync, devconnect-project/*, allow
+    p, role:developer, applications, action/*, devconnect-project/*, allow
+    p, role:developer, projects, get, devconnect-project, allow
+    
+    # 2. Tech Lead Role: Full control over the project resources
+    p, role:techlead, applications, *, devconnect-project/*, allow
+    p, role:techlead, projects, *, devconnect-project, allow
+    p, role:techlead, repositories, *, *, allow
+    
+    # Associate SSO groups or specific users to roles
+    # g, "dev-team-group", role:developer
+    # g, "lead-ops-group", role:techlead

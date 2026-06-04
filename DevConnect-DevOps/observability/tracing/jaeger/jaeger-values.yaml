@@ -1,0 +1,27 @@
+provisionDataStore:
+  cassandra: false
+
+allInOne:
+  enabled: true
+  
+  # Limit resources for all-in-one development mode
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+agent:
+  enabled: false # In all-in-one, the agent is baked in, or apps can send directly to Collector
+
+collector:
+  enabled: false # Handled by allInOne
+
+query:
+  enabled: false # Handled by allInOne
+
+# We will create our own Service for the UI
+ingress:
+  enabled: false

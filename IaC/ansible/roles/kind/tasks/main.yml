@@ -1,0 +1,62 @@
+---
+- name: Check if kubectl is installed
+  command: which kubectl
+  register: kubectl_installed
+  failed_when: false
+  changed_when: false
+
+- name: Install kubectl CLI
+  get_url:
+    url: "https://dl.k8s.io/release/{{ k8s_version | default('v1.30.0') }}/bin/linux/amd64/kubectl"
+    dest: /usr/local/bin/kubectl
+    mode: '0755'
+  when: kubectl_installed.rc != 0
+
+- name: Check if kind is installed
+  command: which kind
+  register: kind_installed
+  failed_when: false
+  changed_when: false
+
+- name: Install Kind CLI
+  get_url:
+    url: "https://kind.sigs.k8s.io/dl/{{ kind_version | default('v0.23.0') }}/kind-linux-amd64"
+    dest: /usr/local/bin/kind
+    mode: '0755'
+  when: kind_installed.rc != 0
+
+- name: Copy Kind cluster configuration
+  template:
+    src: kind-config.yaml.j2
+    dest: /home/ubuntu/kind-config.yaml
+    owner: ubuntu
+    group: ubuntu
+    mode: '0644'
+
+- name: Check existing Kind clusters
+  become: false
+  command: kind get clusters
+  register: kind_clusters
+  failed_when: false
+  changed_when: false
+
+- name: Create Kind cluster
+  become: false
+  command: kind create cluster --config /home/ubuntu/kind-config.yaml --name dev-cluster
+  when: "'dev-cluster' not in kind_clusters.stdout"
+
+- name: Ensure user's kube config directory exists
+  file:
+    path: /home/ubuntu/.kube
+    state: directory
+    owner: ubuntu
+    group: ubuntu
+    mode: '0755'
+
+- name: Fix kubeconfig permissions
+  file:
+    path: /home/ubuntu/.kube/config
+    owner: ubuntu
+    group: ubuntu
+    mode: '0600'
+  failed_when: false

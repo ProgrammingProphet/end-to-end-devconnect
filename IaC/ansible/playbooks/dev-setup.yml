@@ -1,0 +1,13 @@
+---
+- name: Configure Development Ubuntu Instance
+  hosts: dev
+  become: true
+  gather_facts: true
+
+  roles:
+    - common
+    - docker
+    - helm
+    - kustomize
+    - kind
+    - argocd

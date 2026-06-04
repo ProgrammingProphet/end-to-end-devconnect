@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend-devconnect
+  template:
+    metadata:
+      labels:
+        app: frontend-devconnect
+    spec:
+      containers:
+        - name: frontend-devconnect
+          image: programmingprobhet/devconnect-frontend:prod1.0.2
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "1"
+            requests:
+              memory: "256Mi"
+              cpu: "0.5"
+          ports:
+            - containerPort: 8080

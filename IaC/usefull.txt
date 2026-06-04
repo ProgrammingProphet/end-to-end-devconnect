@@ -1,0 +1,48 @@
+update this project accoring to my requirement 
+
+i want 3 stages 
+dev, stage and prod
+use mudule and s3 backend and dynamodb state lock
+and best practices
+use dynamic or stage based resource name creation example
+in dev create dev-bucket nam, prod-sg, stage-vpc etc
+so that management will become very easy 
+also use tags whenever needed 
+IAM roles
+
+dev:
+1 ec2 - ubuntu, AWS-Key.pem
+security group allow standard ports
+vpc, public subnet, internet gateway
+
+in output get ip and add into anisble so that dynamicy i configuation happen
+
+aim: in dev create ec2 instance using terrraform and confirure using ansible 
+using ansble i want to install docker, docker compose, kind , kubectl and setup kind cluster, helm, argocd
+in this is dev area i will used to test base kubernetes appplication 
+
+
+stage: 
+i will do kubeadm
+2 ec2 ubuntu, worker node
+1 ec2 ubuntu, mater node
+AWS-Key.pem
+vpc, public and private subnet 
+3 sg, open requried ports
+
+
+this will be our staging area i will deploy kubernets workload to simulate pre production  (i willl do kubernetes, hahicorp valt, public frontend and private subnet backend and database, alb, cert manager, argocd, promethues, grafana, efk, jaeger)
+in output include ip addess and required info in ini 
+and via ansible we setup kubeadm, install docker, helm, promethues and grafana using helm, kustomize, kind and other imp tools that is required
+
+prod:
+
+EKS setup and IAM roles 
+2 ec2 ubuntu, worker node
+vpc, public and private subnet 
+3 sg, open requried ports
+other required setup
+
+this will be our prod area i will deploy kubernetes workload to simulate  production  (i willl do kubernetes, hahicorp valt, public frontend and private subnet backend and database, alb, cert manager, argocd, promethues, grafana, efk, jaeger)
+in output include ip addess and required info in ini 
+and via ansible we setup argocd, install docker, helm, promethues and grafana using helm, kustomize, kind and other imp tools that is required

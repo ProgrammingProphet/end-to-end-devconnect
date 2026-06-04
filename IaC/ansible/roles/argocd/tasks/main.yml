@@ -1,0 +1,38 @@
+---
+# 1. Install ArgoCD CLI
+- name: Check if ArgoCD CLI is installed
+  command: which argocd
+  register: argocd_cli_installed
+  failed_when: false
+  changed_when: false
+
+- name: Install ArgoCD CLI binary
+  get_url:
+    url: "https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64"
+    dest: /usr/local/bin/argocd
+    mode: '0755'
+  become: "{{ not (local_execution | default(false)) }}"
+  when: 
+    - argocd_cli_installed.rc != 0
+    - not (local_execution | default(false)) or ansible_os_family == "Debian"
+
+# 2. Deploy ArgoCD on Kubernetes cluster
+- name: Create namespace 'argocd'
+  command: kubectl create namespace argocd
+  register: ns_create
+  failed_when: false
+  changed_when: "'created' in ns_create.stdout"
+
+- name: Apply ArgoCD installation manifest
+  command: kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+  register: argocd_manifest
+  changed_when: "'configured' in argocd_manifest.stdout or 'created' in argocd_manifest.stdout"
+
+- name: Wait for ArgoCD Server deployment to be ready
+  command: kubectl rollout status deployment/argocd-server -n argocd --timeout=300s
+  changed_when: false
+
+- name: Expose ArgoCD Server via NodePort (Dev/Stage)
+  command: kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
+  when: not (is_eks | default(false))
+  changed_when: true

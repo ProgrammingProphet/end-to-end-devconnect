@@ -1,0 +1,49 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: backend-rollout
+  namespace: devconnect
+spec:
+  replicas: 4
+  strategy:
+    canary:
+      # Automatically promote steps
+      steps:
+        - setWeight: 10
+        - pause: { duration: 5m } # Pause for 5 minutes for monitoring/smoke testing
+        - setWeight: 25
+        - pause: { duration: 10m }
+        - setWeight: 50
+        - pause: { duration: 5m }
+        - setWeight: 100
+  selector:
+    matchLabels:
+      app: backend-devconnect
+  template:
+    metadata:
+      labels:
+        app: backend-devconnect
+    spec:
+      containers:
+        - name: backend-devconnect
+          image: programmingprobhet/devconnect-backend:latest
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "256m"
+            requests:
+              memory: "64Mi"
+              cpu: "128m"
+          ports:
+            - containerPort: 5000
+          env:
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: MONGODB_URI
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: JWT_SECRET

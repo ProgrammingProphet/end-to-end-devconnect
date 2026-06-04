@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: devconnect-frontend:prod1.0.2
+        image: programmingprobhet/devconnect-frontend:prod1.0.2
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080

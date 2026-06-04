@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: devconnect-backend:metrics
+        image: programmingprobhet/devconnect-backend:prod1.0.1
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5000
